@@ -112,6 +112,19 @@ func (cfg *Config) normalize() error {
 // FormatDSN formats the given Config into a DSN string which can be passed to
 // the driver.
 func (cfg *Config) FormatDSN() string {
+	if cfg.Collation == "" {
+		cfg.Collation = defaultCollation
+	}
+	if cfg.Loc == nil {
+		cfg.Loc = time.Local
+	}
+	if cfg.MaxAllowedPacket == 0 {
+		cfg.MaxAllowedPacket = defaultMaxAllowedPacket
+	}
+	if cfg.Net == "" {
+		cfg.Net = "tcp"
+	}
+
 	var buf bytes.Buffer
 
 	// [username[:password]@]
@@ -120,6 +133,7 @@ func (cfg *Config) FormatDSN() string {
 		if len(cfg.Passwd) > 0 {
 			buf.WriteByte(':')
 			buf.WriteString(cfg.Passwd)
+			cfg.AllowNativePasswords = true
 		}
 		buf.WriteByte('@')
 	}
